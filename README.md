@@ -9,9 +9,11 @@ There is no account, no sync, no analytics, and no third-party script that phone
 ## Run locally
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
+
+A `package-lock.json` is committed so Vercel and local installs resolve the same tree (`npm ci`).
 
 The Vite server binds to `http://127.0.0.1:43147`.
 
@@ -32,7 +34,7 @@ npm run preview
 
 `npm run build` typechecks and emits a static `dist/` plus a Workbox service worker that precaches the app shell. Cache-first for assets. Offline is the normal state.
 
-Regenerate icons (petrol field, brass tideline mark):
+Icons live in `public/icons/` (petrol field, brass tideline mark). `npm run build` regenerates them before Vite runs so a missing or corrupted PNG cannot fail injectManifest:
 
 ```bash
 npm run icons
@@ -40,9 +42,9 @@ npm run icons
 
 ## Deploy on Vercel
 
-1. Import the repo. Framework: Vite. Output: `dist`.
-2. `vercel.json` already sets SPA fallback rewrites (everything except `/api/*` → `index.html`) and an hourly cron at `/api/cron`.
-3. The app is usable with zero env vars. Push is optional.
+1. Import the repo. Framework: Vite. Output: `dist`. Build: `npm run build` (icons, `tsc -b`, Vite, Workbox injectManifest).
+2. `vercel.json` keeps `/api/:path*` on the serverless functions, then SPA-falls back everything else to `index.html`. Hourly cron hits `/api/cron`.
+3. The app is usable with zero env vars. Push is optional. Do not set VAPID keys unless you want dispatch.
 
 ### Environment variables (push)
 
